@@ -47,7 +47,7 @@ def get_logger() -> logging.Logger:
     log_handler.setLevel(logging.INFO)
 
     log_formatter = RedactingFormatter(list(PII_FIELDS))
-    log_handle.setFormatter(log_formatter)
+    log_handler.setFormatter(log_formatter)
 
-    logger.addHandler(log_handler)
-    return logger
+    user_logger.addHandler(log_handler)
+    return user_logger
