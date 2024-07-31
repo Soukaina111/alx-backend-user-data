@@ -42,46 +42,46 @@ def get_db() -> mysql.connector.connection.MYSQLConnection:
 def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """ Obfuscate specified fields in log messages """
-    for fd in fields:
-        message = re.sub(f'{fd}=(.*?){separator}',
-                         f'{fd}={redaction}{separator}', message)
+    for field in fields:
+        message = re.sub(f'{field}=(.*?){separator}',
+                         f'{field}={redaction}{separator}', message)
     return message
 
 
 def get_logger() -> logging.Logger:
     """ Returns a logging.Logger object """
-    ggl = logging.getLogger("user_data")
-    ggl.setLevel(logging.INFO)
-    ggl.propagate = False
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
-    to_handler = logging.StreamHandler()
-    to_handler.setLevel(logging.INFO)
+    target_handler = logging.StreamHandler()
+    target_handler.setLevel(logging.INFO)
 
     formatter = RedactingFormatter(list(PII_FIELDS))
-    to_handler.setFormatter(formatter)
+    target_handler.setFormatter(formatter)
 
-    ggl.addHandler(to_handler)
-    return ggl
+    logger.addHandler(target_handler)
+    return logger
 
 
 def main() -> None:
     """ Obtain database connection, retrieve all rows from users table,
     and display each row under a filtered format """
-    datab = get_db()
-    sor = db.cursor()
-    sor.execute("SELECT * FROM users;")
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
 
-    headers = [field[0] for field in sor.description]
-    ggl = get_logger()
+    headers = [field[0] for field in cursor.description]
+    logger = get_logger()
 
-    for r in sor:
-        data_res = ''
-        for f, p in zip(r, headers):
-            data_res += f'{p}={(f)}; '
-        ggl.info(data-res)
+    for row in cursor:
+        info_answer = ''
+        for f, p in zip(row, headers):
+            info_answer += f'{p}={(f)}; '
+        logger.info(info_answer)
 
-    sor.close()
-    datab.close()
+    cursor.close()
+    db.close()
 
 
 if __name__ == '__main__':
