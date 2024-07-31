@@ -34,20 +34,19 @@ class RedactingFormatter(logging.Formatter):
                             super().format(record), self.SEPARATOR)
 
 
-PII_FIELDS: List[str] = ["name", "email", "ssn", "phone"]
-
+PII_FIELDS = ("name", "email", "password", "ssn", "phone")
 
 def get_logger() -> logging.Logger:
-    """ Returns a logging.Logger object """
+    """ Displays a logging.Logger object """
     user_logger = logging.getLogger("user_data")
     user_logger.setLevel(logging.INFO)
     user_logger.propagate = False
 
-    log_handler = logging.StreamHandler()
-    log_handler.setLevel(logging.INFO)
+    target_handler = logging.StreamHandler()
+    target_handler.setLevel(logging.INFO)
 
-    log_formatter = RedactingFormatter(list(PII_FIELDS))
-    log_handler.setFormatter(log_formatter)
+    formatter = RedactingFormatter(list(PII_FIELDS))
+    target_handle.setFormatter(formatter)
 
-    user_logger.addHandler(log_handler)
+    user_logger.addHandler(target_handler)
     return user_logger
