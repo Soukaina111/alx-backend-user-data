@@ -2,16 +2,14 @@
 """ 0. Regex-ing """
 
 import re
-from typing import List, Tuple, Callable, Match
+from typing import List
 
 
-def filter_datum(
-    fields: List[str],
-    redaction: str,
-    message: str,
-    separator: str,
-) -> str:
-    # Create regex pattern to match fields
-    pattern = r'|'.join(rf'({field})=\w+' for field in fields)
-    # Replace matched fields with redaction
-    return re.sub(pattern, lambda m: f'{m.groups()[0]}={redaction}', message)
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
+    """ # Create regex pattern to match fields and 
+    Replace matched fields with redaction"""
+    for field in fields:
+        message = re.sub(f'{field}=(.*?){separator}',
+                         f'{field}={redaction}{separator}', message)
+    return message
