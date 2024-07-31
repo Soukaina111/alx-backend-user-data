@@ -32,3 +32,22 @@ class RedactingFormatter(logging.Formatter):
         """ Displays filtered values from log records """
         return filter_datum(self.fields, self.REDACTION,
                             super().format(record), self.SEPARATOR)
+
+
+PII_FIELDS: List[str] = ["name", "email", "ssn", "phone"]
+
+
+def get_logger() -> logging.Logger:
+    """ Returns a logging.Logger object """
+    user_logger = logging.getLogger("user_data")
+    user_logger.setLevel(logging.INFO)
+    user_logger.propagate = False
+
+    log_handler = logging.StreamHandler()
+    log_handler.setLevel(logging.INFO)
+
+    log_formatter = RedactingFormatter(list(PII_FIELDS))
+    log_handle.setFormatter(log_formatter)
+
+    logger.addHandler(log_handler)
+    return logger
