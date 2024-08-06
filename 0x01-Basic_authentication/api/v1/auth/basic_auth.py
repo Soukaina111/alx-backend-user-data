@@ -26,9 +26,9 @@ class BasicAuth(Auth):
             return None
 
         # Extract the encoded part of the authorization header
-        coded = authorization_header.split(' ', 1)[1]
+        encoded = authorization_header.split(' ', 1)[1]
 
-        return coded
+        return encoded
 
     def decode_base64_authorization_header(self,
                                            base64_authorization_header: str
@@ -44,14 +44,14 @@ class BasicAuth(Auth):
 
         try:
             # Encode the base64 authorization header to bytes
-            coded = base64_authorization_header.encode('utf-8')
+            encoded = base64_authorization_header.encode('utf-8')
             # Decode the base64 bytes to a string
             decoded64 = b64decode(encoded)
-            notcoded = decoded64.decode('utf-8')
+            decoded = decoded64.decode('utf-8')
         except BaseException:
             return None
 
-        return notcoded
+        return decoded
 
     def extract_user_credentials(self,
                                  decoded_base64_authorization_header: str
@@ -73,9 +73,9 @@ class BasicAuth(Auth):
             return None, None
 
         # Split the decoded base64 authorization header into email and password
-        datas = decoded_base64_authorization_header.split(':', 1)
+        credentials = decoded_base64_authorization_header.split(':', 1)
 
-        return datas[0], datas[1]
+        return credentials[0], credentials[1]
 
     def user_object_from_credentials(self, user_email: str,
                                      user_pwd: str) -> TypeVar('User'):
@@ -93,12 +93,12 @@ class BasicAuth(Auth):
 
         try:
             # Search for users with the given email
-            search_users = User.search({'email': user_email})
+            found_users = User.search({'email': user_email})
         except Exception:
             return None
 
         # Check if the password is valid for any of the found users
-        for user in search_users:
+        for user in found_users:
             if user.is_valid_password(user_pwd):
                 return user
 
@@ -107,21 +107,21 @@ class BasicAuth(Auth):
     def current_user(self, request=None) -> TypeVar('User'):
         """ overloads Auth and retrieves the User instance for a request """
         # Get the authorization header from the request
-        val_header = self.authorization_header(request)
+        auth_header = self.authorization_header(request)
 
         # Check if the authorization header is provided
-        if not val_header:
+        if not auth_header:
             return None
 
         # Extract the base64 encoded part of the authorization header
-        coded = self.extract_base64_authorization_header(val_header)
+        encoded = self.extract_base64_authorization_header(auth_header)
 
         # Check if the base64 encoded part is provided
-        if not coded:
+        if not encoded:
             return None
 
         # Decode the base64 encoded part
-        decoded = self.decode_base64_authorization_header(coded)
+        decoded = self.decode_base64_authorization_header(encoded)
 
         # Check if the decoded value is provided
         if not decoded:
