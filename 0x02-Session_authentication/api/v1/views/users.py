@@ -13,9 +13,7 @@ def view_all_users() -> str:
     Return:
       - list of all User objects JSON represented
     """
-    # Retrieve all User objects from the database
     all_users = [user.to_json() for user in User.all()]
-    # Return the JSON representation of all User objects
     return jsonify(all_users)
 
 
@@ -28,7 +26,6 @@ def view_one_user(user_id: str = None) -> str:
       - User object JSON represented
       - 404 if the User ID doesn't exist
     """
-    # If the user_id is not provided, return a 404 error
     if user_id is None:
         abort(404)
     # If the user_id is "me" and there is no current_user, return a 404 error
@@ -39,6 +36,9 @@ def view_one_user(user_id: str = None) -> str:
             # If the user_id is "me" and there is a current_user, return the
             # JSON representation of the current_user
             return jsonify(request.current_user.to_json())
+    # If user_id is None, return a 404 error
+    if user_id is None:
+        abort(404)
     # Retrieve the user from the database using the User.get method
     user = User.get(user_id)
     # If the user was not found, return a 404 error
@@ -57,17 +57,12 @@ def delete_user(user_id: str = None) -> str:
       - empty JSON is the User has been correctly deleted
       - 404 if the User ID doesn't exist
     """
-    # If the user_id is not provided, return a 404 error
     if user_id is None:
         abort(404)
-    # Retrieve the user from the database using the User.get method
     user = User.get(user_id)
-    # If the user was not found, return a 404 error
     if user is None:
         abort(404)
-    # Delete the user from the database
     user.remove()
-    # Return an empty JSON response with a 200 status code
     return jsonify({}), 200
 
 
@@ -83,23 +78,18 @@ def create_user() -> str:
       - User object JSON represented
       - 400 if can't create the new User
     """
-    # Try to get the JSON data from the request
     rj = None
     error_msg = None
     try:
         rj = request.get_json()
     except Exception as e:
         rj = None
-    # If the JSON data is not valid, set an error message
     if rj is None:
         error_msg = "Wrong format"
-    # If the email is missing, set an error message
     if error_msg is None and rj.get("email", "") == "":
         error_msg = "email missing"
-    # If the password is missing, set an error message
     if error_msg is None and rj.get("password", "") == "":
         error_msg = "password missing"
-    # If there is no error, create a new User object and save it to the database
     if error_msg is None:
         try:
             user = User()
@@ -108,11 +98,9 @@ def create_user() -> str:
             user.first_name = rj.get("first_name")
             user.last_name = rj.get("last_name")
             user.save()
-            # Return the JSON representation of the new User object with a 201 status code
             return jsonify(user.to_json()), 201
         except Exception as e:
             error_msg = "Can't create User: {}".format(e)
-    # If there is an error, return the error message with a 400 status code
     return jsonify({'error': error_msg}), 400
 
 
@@ -129,29 +117,21 @@ def update_user(user_id: str = None) -> str:
       - 404 if the User ID doesn't exist
       - 400 if can't update the User
     """
-    # If the user_id is not provided, return a 404 error
     if user_id is None:
         abort(404)
-    # Retrieve the user from the database using the User.get method
     user = User.get(user_id)
-    # If the user was not found, return a 404 error
     if user is None:
         abort(404)
-    # Try to get the JSON data from the request
     rj = None
     try:
         rj = request.get_json()
     except Exception as e:
         rj = None
-    # If the JSON data is not valid, return a 400 error
     if rj is None:
         return jsonify({'error': "Wrong format"}), 400
-    # Update the user's first_name and last_name based on the JSON data
     if rj.get('first_name') is not None:
         user.first_name = rj.get('first_name')
     if rj.get('last_name') is not None:
         user.last_name = rj.get('last_name')
-    # Save the updated user to the database
     user.save()
-    # Return the JSON representation of the updated user with a 200 status code
     return jsonify(user.to_json()), 200
