@@ -3,6 +3,7 @@
 Route module for the API
 """
 
+
 import os
 from os import getenv
 from typing import Tuple
@@ -17,20 +18,15 @@ from api.v1.auth.session_db_auth import SessionDBAuth
 from api.v1.auth.session_exp_auth import SessionExpAuth
 from api.v1.views import app_views
 
-# Create a Flask application instance
 app = Flask(__name__)
-
-# Register the Blueprint for the API views
 app.register_blueprint(app_views)
-
-# Enable CORS for the /api/v1/* routes, allowing access from any origin
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
-
 # Create a variable auth initialized to None after the CORS definition
 auth = None
 
+
 # Update api/v1/app.py for using SessionAuth instance for the variable
-# auth depending of the value of the environment variable AUTH_TYPE. If
+# auth depending of the value of the environment variable AUTH_TYPE, If
 # AUTH_TYPE is equal to session_auth:
 #   import SessionAuth from api.v1.auth.session_auth
 #   create an instance of SessionAuth and assign it to the variable auth
@@ -46,14 +42,14 @@ elif auth_type == "basic_auth":
 else:
     auth = Auth()
 
-# Define the 404 error handler
+
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
 
-# Define the 401 error handler
+
 @app.errorhandler(401)
 def unauthorized(error: Exception) -> Tuple[jsonify, int]:
     """Error handler for unauthorized requests.
@@ -67,7 +63,7 @@ def unauthorized(error: Exception) -> Tuple[jsonify, int]:
     """
     return jsonify({"error": "Unauthorized"}), 401
 
-# Define the 403 error handler
+
 @app.errorhandler(403)
 def forbidden(error: Exception) -> Tuple[jsonify, int]:
     """Error handler for unauthorized requests.
@@ -81,7 +77,7 @@ def forbidden(error: Exception) -> Tuple[jsonify, int]:
     """
     return jsonify({"error": "Forbidden"}), 403
 
-# Define a before_request handler to handle authentication and authorization
+
 @app.before_request
 def handle_request():
     """
@@ -90,32 +86,30 @@ def handle_request():
     # If auth is None, do nothing
     if auth is None:
         return
-
-    # Create a list of excluded paths that don't require authentication
+    # Create list of excluded paths
     excluded_paths = ['/api/v1/status/',
                       '/api/v1/unauthorized/',
                       '/api/v1/forbidden/',
                       '/api/v1/auth_session/login/']
-
-    # If the request path is not part of the excluded list, check authentication
+    # if request.path is not part of the list above, do nothing
+    # You must use the method require_auth from the auth instance
     if not auth.require_auth(request.path, excluded_paths):
         return
-
-    # If both the authorization header and session cookie are missing, raise a 401 error
+    # If auth.authorization_header(request) and auth.session_cookie(request)
+    # return None, raise the error, 401 - you must use abort
     auth_header = auth.authorization_header(request)
     session_cookie = auth.session_cookie(request)
     if auth_header is None and session_cookie is None:
         abort(401)
-
-    # If the current user is not found, raise a 403 error
+    # If auth.current_user(request) returns None, raise the error 403 - you
+    # must use abort
     user = auth.current_user(request)
     if user is None:
         abort(403)
-
-    # Assign the current user to the request object
+    # Assign the result of auth.current_user(request) to request.current_user
     request.current_user = user
 
-# Run the Flask application if this script is executed directly
+
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
     port = getenv("API_PORT", "5000")
