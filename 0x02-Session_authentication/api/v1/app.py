@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module Routes  for the API
+Route module for the API
 """
 
 import os
@@ -92,13 +92,13 @@ def handle_request():
         return
 
     # Create a list of excluded paths that don't require authentication
-    no_path = ['/api/v1/status/',
+    excluded_paths = ['/api/v1/status/',
                       '/api/v1/unauthorized/',
                       '/api/v1/forbidden/',
                       '/api/v1/auth_session/login/']
 
-    # If the request path is not part of the no_path list, check authentication
-    if not auth.require_auth(request.path, no_path):
+    # If the request path is not part of the excluded list, check authentication
+    if not auth.require_auth(request.path, excluded_paths):
         return
 
     # If both the authorization header and session cookie are missing, raise a 401 error
@@ -108,12 +108,12 @@ def handle_request():
         abort(401)
 
     # If the current user is not found, raise a 403 error
-    cs = auth.current_user(request)
-    if cs is None:
+    user = auth.current_user(request)
+    if user is None:
         abort(403)
 
     # Assign the current user to the request object
-    request.current_user = cs
+    request.current_user = user
 
 # Run the Flask application if this script is executed directly
 if __name__ == "__main__":
