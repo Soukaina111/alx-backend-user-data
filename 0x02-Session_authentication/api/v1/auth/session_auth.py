@@ -35,11 +35,11 @@ class SessionAuth(Auth):
         # Check if user_id is not None and is of type str
         if type(user_id) is str:
             # Generate a unique session ID using the uuid4() function
-            id_of_ses = str(uuid4())
+            session_id = str(uuid4())
             # Store the mapping of session ID to user ID in the dictionary
-            self.user_id_by_session_id[id_of_ses] = user_id
+            self.user_id_by_session_id[session_id] = user_id
             # Return the generated session ID
-            return id_of_ses
+            return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """
