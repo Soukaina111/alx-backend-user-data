@@ -84,7 +84,6 @@ def before_request() -> str:
 
 # Entry point of the application
 if __name__ == "__main__":
-    # Get the API host and port from environment variables, or use default values
     host = getenv("API_HOST", "0.0.0.0")
     port = getenv("API_PORT", "5000")
 
