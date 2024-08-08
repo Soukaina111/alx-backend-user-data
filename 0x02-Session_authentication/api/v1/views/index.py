@@ -20,27 +20,26 @@ def stats() -> str:
     Return:
       - the number of each objects
     """
+    # Import the User model to retrieve the count
     from models.user import User
     stats = {}
     stats['users'] = User.count()
     return jsonify(stats)
 
 
-@app_views.route('/unauthorized/', strict_slashes=False, methods=['GET'])
-def unauthorized_endpoint() -> None:
-    """Endpoint that raises a 401 error.
-
-    Returns:
-        None: None.
+@app_views.route('/unauthorized', methods=['GET'], strict_slashes=False)
+def unauthorized() -> str:
+    """ GET /api/v1/unauthorized
+    Return:
+      - raises a 401 error by using abort
     """
     abort(401)
 
 
-@app_views.route('/forbidden/', strict_slashes=False, methods=['GET'])
-def forbidden_endpoint() -> None:
-    """Endpoint that raises a 403 error.
-
-    Returns:
-        None: None.
+@app_views.route('/forbidden', methods=['GET'], strict_slashes=False)
+def forbidden() -> str:
+    """ GET /api/v1/forbidden
+    Return:
+      - raises a 403 error by using abort
     """
     abort(403)
