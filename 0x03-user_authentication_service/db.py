@@ -64,17 +64,17 @@ class DB:
 
     def find_user_by(self, **kwargs) -> User:
         """
-         Find a user based on given criteria
-         Args:
-         **kwargs: Search criteria for finding a user.
-         Returns:
-         User: The found user instance
-         Raises NoResultFound if no matching user is found.
-         """
-         user = self._session.query(User).filter_by(**kwargs).first()
-         if not user:
-             raise NoResultFound("No user found")
-         return user
+        Find a user based on given criteria
+        Args:
+        **kwargs: Search criteria for finding a user.
+        Returns:
+        User: The found user instance
+        Raises NoResultFound if no matching user is found.
+        """
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if not user:
+            raise NoResultFound("No user found")
+        return user
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """
