@@ -5,8 +5,10 @@ Authentication module
 import bcrypt
 from db import DB
 from user import User
-from uuid import uuid4
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError
+from uuid import uuid4
+from typing import Optional
 
 
 def _hash_password(password: str) -> bytes:
