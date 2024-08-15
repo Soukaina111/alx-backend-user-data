@@ -4,7 +4,10 @@ Basic Flask app for a minimal WSGI application
 """
 from flask import Flask, jsonify, request, abort, redirect, url_for
 from auth import Auth
+
 app = Flask(__name__)
+app.url_map.strict_slashes = False
+app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 AUTH = Auth()
 
 
