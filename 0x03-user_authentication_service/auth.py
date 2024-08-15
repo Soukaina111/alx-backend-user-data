@@ -179,10 +179,10 @@ class Auth:
         if user is None:
             raise ValueError()
         # Generate a new password reset token & update the user's record in db
-        new_token = _generate_uuid()
-        self._db.update_user(user.id, new_token=reset_token)
+        reset_token = _generate_uuid()
+        self._db.update_user(user.id, reset_token=reset_token)
         # Return the generated password reset token
-        return new_token
+        return reset_token
 
     def update_password(self, reset_token: str, password: str) -> None:
         """Updates a user's password using a reset token.
